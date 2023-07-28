@@ -1,17 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const Note = require('../models/Note');
+const Interview = require('../models/Interview');
 const { body, validationResult } = require('express-validator');
 var alert = require('alert');
+const userController = require("../controller/user");
 
-// ROUTE 1: Get All the Notes using: GET "/api/notes/getuser"
-router.get('/fetchallnotes', async (req, res) => {
-    const notes = await Note.find();
-    res.json(notes);
-})
+// ROUTE 1: Get All the Interviews using: GET "/api/interviews/getuser"
+router.get('/', userController.getHome);
 
-// ROUTE 2: Add a new Note using: POST "/api/notes/addnote"
-router.post('/addnote', [
+// ROUTE 2: Add a new Interview using: POST "/api/interviews/addinterview"
+router.post('/addinterview', [
     body('title', 'Enter a valid title').isLength({ min: 1 }),
     body('description', 'Description must be atleast 5 characters').isLength({ min: 1 }),
     body('interviewee_email').isEmail(),
@@ -26,14 +24,14 @@ router.post('/addnote', [
             alert("Please Enter valid credentials! always check -> interviewee_email and interviewer_email should be valid email.");
             return res.status(400).json({});
         }
-        const notes = await Note.find();
+        const interviews = await Interview.find();
 
         const INTERVALS = [];
         let stime = 0, etime = 0;
-        for (let i = 0; i < notes.length; i++) {
-            if (notes[i].presentDate === presentDate && (notes[i].interviewee_email === interviewee_email || notes[i].interviewer_email === interviewer_email)) {
-                stime = Number(notes[i].start_time.split(':')[0]) + Number(notes[i].start_time.split(':')[1]) / 60;
-                etime = Number(notes[i].end_time.split(':')[0]) + Number(notes[i].end_time.split(':')[1]) / 60;
+        for (let i = 0; i < interviews.length; i++) {
+            if (interviews[i].presentDate === presentDate && (interviews[i].interviewee_email === interviewee_email || interviews[i].interviewer_email === interviewer_email)) {
+                stime = Number(interviews[i].start_time.split(':')[0]) + Number(interviews[i].start_time.split(':')[1]) / 60;
+                etime = Number(interviews[i].end_time.split(':')[0]) + Number(interviews[i].end_time.split(':')[1]) / 60;
                 INTERVALS.push([stime, etime]);
             }
         }
@@ -48,12 +46,12 @@ router.post('/addnote', [
             }
         }
 
-        const note = new Note({
+        const interview = new Interview({
             title, description, interviewee_email, interviewer_email, presentDate, start_time, end_time
         })
-        const savedNote = await note.save()
+        const savedInterview = await interview.save()
         alert("Interview scheduled successfully without an error");
-        res.json(savedNote)
+        res.json(savedInterview)
 
     } catch (error) {
         console.error(error.message);
@@ -61,8 +59,8 @@ router.post('/addnote', [
     }
 })
 
-// ROUTE 3: Update an existing Note using: PUT "/api/notes/updatenote"
-router.put('/updatenote/:id', [
+// ROUTE 3: Update an existing Interview using: PUT "/api/interviews/updateinterview"
+router.put('/updateinterview/:id', [
         body('title', 'Enter a valid title').isLength({ min: 1 }),
         body('description', 'Description must be atleast 5 characters').isLength({ min: 1 }),
         body('interviewee_email').isEmail(),
@@ -77,29 +75,29 @@ router.put('/updatenote/:id', [
             return res.status(400).json({});
         }
         
-        // Create a newNote object
-        const newNote = {};
-        if (title) { newNote.title = title };
-        if (description) { newNote.description = description };
-        if (interviewee_email) { newNote.interviewee_email = interviewee_email };
-        if (interviewer_email) { newNote.interviewer_email = interviewer_email };
-        if (presentDate) { newNote.presentDate = presentDate };
-        if (start_time) { newNote.start_time = start_time };
-        if (end_time) { newNote.end_time = end_time };
+        // Create a newInterview object
+        const newInterview = {};
+        if (title) { newInterview.title = title };
+        if (description) { newInterview.description = description };
+        if (interviewee_email) { newInterview.interviewee_email = interviewee_email };
+        if (interviewer_email) { newInterview.interviewer_email = interviewer_email };
+        if (presentDate) { newInterview.presentDate = presentDate };
+        if (start_time) { newInterview.start_time = start_time };
+        if (end_time) { newInterview.end_time = end_time };
 
-        const note = await Note.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true })
-        res.json({ note });
+        const interview = await Interview.findByIdAndUpdate(req.params.id, { $set: newInterview }, { new: true })
+        res.json({ interview });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
 })
 
-// ROUTE 4: Delete an existing Note using: DELETE "/api/notes/deletenote"
-router.delete('/deletenote/:id', async (req, res) => {
+// ROUTE 4: Delete an existing Interview using: DELETE "/api/interviews/deleteinterview"
+router.delete('/deleteinterview/:id', async (req, res) => {
     try {
-        const note = await Note.findByIdAndDelete(req.params.id)
-        res.json({ "Success": "Note has been deleted", note: note });
+        const interview = await Interview.findByIdAndDelete(req.params.id)
+        res.json({ "Success": "Interview has been deleted", interview: interview });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");

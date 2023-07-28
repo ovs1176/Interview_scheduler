@@ -2,7 +2,7 @@ const { timestampFormat } = require('concurrently/src/defaults');
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const NotesSchema = new Schema({
+const InterviewSchema = new Schema({
     user:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
@@ -31,6 +31,10 @@ const NotesSchema = new Schema({
     end_time: {
         type: String,
     },
+    isDeleted : {
+        type: Boolean,
+        default: false
+    }
   });
 
-  module.exports = mongoose.model('notes', NotesSchema);
+  module.exports = mongoose.model('interview', InterviewSchema);

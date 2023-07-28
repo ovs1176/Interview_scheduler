@@ -6,12 +6,12 @@ import {
 } from "react-router-dom";
 import Navbar from './components/Navbar';
 import { Home } from './components/Home';
-import NoteState from './context/notes/NoteState';
+import InterviewState from './context/interviews/InterviewState';
 
 function App(){
   return (
     <>
-      <NoteState>
+      <InterviewState>
         <Router>
           <Navbar />
           <div className="container">
@@ -22,7 +22,7 @@ function App(){
             </Switch>
           </div>
         </Router>
-      </NoteState>
+      </InterviewState>
     </>
   );
 }
